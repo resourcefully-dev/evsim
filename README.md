@@ -7,9 +7,9 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/evsim)](https://cran.r-project.org/package=evsim)
-[![R-CMD-check](https://github.com/mcanigueral/evsim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mcanigueral/evsim/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/resourcefully-dev/evsim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/resourcefully-dev/evsim/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/mcanigueral/evsim/branch/main/graph/badge.svg)](https://app.codecov.io/gh/mcanigueral/evsim?branch=main)
+coverage](https://codecov.io/gh/resourcefully-dev/evsim/branch/main/graph/badge.svg)](https://app.codecov.io/gh/resourcefully-dev/evsim?branch=main)
 <!-- badges: end -->
 
 ## Overview
@@ -57,7 +57,7 @@ pak::pak("resourcefully-dev/evsim")
 
 If you encounter a clear bug, please open an issue with a minimal
 reproducible example on
-[GitHub](https://github.com/mcanigueral/evprof/issues).
+[GitHub](https://github.com/resourcefully-dev/evsim/issues).
 
 For further technical details, you can read the following academic
 articles about the methodology used in this paper:
