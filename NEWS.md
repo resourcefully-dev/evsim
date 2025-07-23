@@ -2,6 +2,7 @@
 
 * Replaced multi-core processing from `parallel::mclapply()` by `purrr::in_parallel()` using `mirai` package
 * Removed `mc.cores` parameter from all functions since now the parallel processing must be defined by the user
+* Changed the parallel processing window from
 
 
 # evsim 1.6.1

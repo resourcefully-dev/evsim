@@ -40,5 +40,5 @@ articles:
     navbar: ~
     contents:
       - time_resolution
-      - multi_processing
+      - parallel_processing
       - custom_evmodel
