@@ -49,7 +49,7 @@ add_charging_infrastructure <- function(sessions, resolution = 15, min_stations 
   # How many charging stations (of two sockets) do we need?
   connections <- sessions %>%
     mutate(Profile = "n_connections") %>%
-    get_occupancy(resolution = resolution, by = "Profile", mc.cores = 1)
+    get_occupancy(resolution = resolution, by = "Profile")
 
   connections_pct <- get_occupancy_curve_data(connections$n_connections)
 
@@ -138,8 +138,6 @@ add_charging_infrastructure <- function(sessions, resolution = 15, min_stations 
 #' @param by character, being 'Profile' or 'Session'. When `by='Profile'` each column corresponds to an EV user profile.
 #' @param resolution integer, time resolution (in minutes) of the sessions datetime variables.
 #' If `dttm_seq` is defined this parameter is ignored.
-#' @param mc.cores integer, number of cores to use.
-#' Must be at least one, and parallelization requires at least two cores.
 #'
 #' @return ggplot
 #' @export
@@ -158,13 +156,12 @@ add_charging_infrastructure <- function(sessions, resolution = 15, min_stations 
 #'   resolution = 15
 #' )
 #'
-plot_occupancy_duration_curve <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 15, mc.cores = 1) {
+plot_occupancy_duration_curve <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 15) {
   connections <- get_occupancy(
     sessions,
     dttm_seq = dttm_seq,
     by = by,
-    resolution = resolution,
-    mc.cores = mc.cores
+    resolution = resolution
   )
 
   connections_curves <- map(

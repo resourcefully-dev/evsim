@@ -4,13 +4,7 @@
 \alias{get_demand}
 \title{Time-series EV demand}
 \usage{
-get_demand(
-  sessions,
-  dttm_seq = NULL,
-  by = "Profile",
-  resolution = 15,
-  mc.cores = 1
-)
+get_demand(sessions, dttm_seq = NULL, by = "Profile", resolution = 15)
 }
 \arguments{
 \item{sessions}{tibble, sessions data set in standard format marked by \code{{evprof}} package}
@@ -22,9 +16,6 @@ variable of the returned time-series data frame.}
 
 \item{resolution}{integer, time resolution (in minutes) of the sessions datetime variables.
 If \code{dttm_seq} is defined this parameter is ignored.}
-
-\item{mc.cores}{integer, number of cores to use.
-Must be at least one, and parallelization requires at least two cores.}
 }
 \value{
 time-series tibble with first column of type \code{datetime}
