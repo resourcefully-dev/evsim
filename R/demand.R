@@ -168,6 +168,27 @@ expand_session <- function(session, resolution) {
   return( session_expanded )
 }
 
+expand_sessions_parallel <- function(sessions_lst, resolution) {
+  if (!requireNamespace("mirai", quietly = TRUE) ||
+      !requireNamespace("carrier", quietly = TRUE)) {
+
+    sessions_lst %>%
+      purrr::map(
+        \(x) expand_sessions(x, resolution)
+      )
+
+  } else {
+    sessions_lst %>%
+      purrr::map(
+        purrr::in_parallel(
+          \(x) expand_sessions(x, resolution),
+          expand_sessions = expand_sessions,
+          resolution = resolution
+        )
+      )
+  }
+}
+
 
 #' Time-series EV demand
 #'
@@ -287,13 +308,7 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
       # Expand sessions
       sessions_expanded <- sessions_to_expand  %>%
         split(sessions_to_expand$Window) %>%
-        map(
-          in_parallel(
-            \(x) expand_sessions(x, resolution),
-            expand_sessions = expand_sessions,
-            resolution = resolution
-          )
-        ) %>%
+        expand_sessions_parallel(resolution) %>%
         list_rbind()
 
       # Join all sessions together
@@ -454,13 +469,7 @@ get_occupancy <- function(sessions, dttm_seq = NULL, by = "Profile", resolution 
       # Expand sessions
       sessions_expanded <- sessions_to_expand  %>%
         split(sessions_to_expand$Window) %>%
-        map(
-          in_parallel(
-            \(x) expand_sessions(x, resolution),
-            expand_sessions = expand_sessions,
-            resolution = resolution
-          )
-        ) %>%
+        expand_sessions_parallel(resolution) %>%
         list_rbind()
 
       # Join all sessions together

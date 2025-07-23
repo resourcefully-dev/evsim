@@ -2,4 +2,4 @@
 R/sysdata.rda
 R/*.rds
 R/*.RDS
-.RHistory
+.Rhistory
