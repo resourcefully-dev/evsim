@@ -77,7 +77,7 @@
     
     
 <p>The functions <code><a href="../reference/get_demand.html">get_demand()</a></code> and
-<code>get_n_connections()</code> have time-series calculations that are
+<code><a href="../reference/get_occupancy.html">get_occupancy()</a></code> have time-series calculations that are
 repeated on a daily basis. A 24-hour period is considered an independent
 optimization window, thus the corresponding time-series calculations can
 be done in parallel.</p>
@@ -95,6 +95,12 @@ performance CPU cores (P-core) running at up to 4.5 GHz along with 4
 efficient cores (E-core) running at up to 2.6 GHz. So, when
 <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> returns 14, macOS is exposing 14
 logical cores — but not all of them are equal in speed.</p>
+<p>In <strong>evsim</strong>, parallel processing is used inside
+<code><a href="../reference/get_demand.html">get_demand()</a></code> and <code><a href="../reference/get_occupancy.html">get_occupancy()</a></code> functions,
+using the <strong>mirai</strong> package and its
+<code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code> function to set the number of cores that
+we want to work in parallel. Below you will find an example about how to
+use this functionality.</p>
 <div class="section level2">
 <h2 id="time-series-ev-demand-calculation">Time-series EV demand calculation<a class="anchor" aria-label="anchor" href="#time-series-ev-demand-calculation"></a>
 </h2>
@@ -103,15 +109,16 @@ EV sessions from October 2018 to September 2021. If we filter sessions
 corresponding to 2019, we have &gt;15.000 sessions, with an average of
 70 charging sessions during working days.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sessions_2019</span> <span class="op">&lt;-</span> <span class="fu">evsim</span><span class="fu">::</span><span class="va"><a href="../reference/california_ev_sessions_profiles.html">california_ev_sessions_profiles</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html" class="external-link">year</a></span><span class="op">(</span><span class="va">ConnectionStartDateTime</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2019</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sessions_2019</span> <span class="op">&lt;-</span> <span class="fu">evsim</span><span class="fu">::</span><span class="va"><a href="../reference/california_ev_sessions_profiles.html">california_ev_sessions_profiles</a></span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">year</span><span class="op">(</span><span class="va">ConnectionStartDateTime</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2019</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s use these real charging sessions to calculate their time-series
-demand with <code><a href="../reference/get_demand.html">get_demand()</a></code> function, using multiple cores but
-also different values of number of days (optimization windows):</p>
+demand with <code><a href="../reference/get_demand.html">get_demand()</a></code> function, using multiple cores
+(with <code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code>) but also different values of number
+of days (optimization windows):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_days_seq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">15</span>, <span class="fl">30</span>, <span class="fl">120</span>, <span class="fl">365</span><span class="op">)</span> <span class="co"># Days in a year</span></span>
 <span><span class="va">n_cores_seq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="co"># 10 performance cores (P-core)</span></span>
-<span><span class="va">cores_time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span><span class="va">cores_time</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
 <span>  days <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">n_days_seq</span>, each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">n_cores_seq</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">n_cores_seq</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">n_days_seq</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>  time <span class="op">=</span> <span class="fl">0</span></span>
@@ -119,12 +126,12 @@ also different values of number of days (optimization windows):</p>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">nd</span> <span class="kw">in</span> <span class="va">n_days_seq</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">nd</span>, <span class="st">" days ---------------- "</span><span class="op">)</span></span>
-<span>  <span class="va">sessions</span> <span class="op">&lt;-</span> <span class="va">sessions_2019</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/date.html" class="external-link">date</a></span><span class="op">(</span><span class="va">ConnectionStartDateTime</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">dmy</a></span><span class="op">(</span><span class="fl">01012019</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/period.html" class="external-link">days</a></span><span class="op">(</span><span class="va">nd</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="va">sessions</span> <span class="op">&lt;-</span> <span class="va">sessions_2019</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/date.html" class="external-link">date</a></span><span class="op">(</span><span class="va">ConnectionStartDateTime</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fu">dmy</span><span class="op">(</span><span class="fl">01012019</span><span class="op">)</span><span class="op">+</span><span class="fu">days</span><span class="op">(</span><span class="va">nd</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">evsim</span><span class="fu">::</span><span class="fu"><a href="../reference/adapt_charging_features.html">adapt_charging_features</a></span><span class="op">(</span>time_resolution <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">mcc</span> <span class="kw">in</span> <span class="va">cores_time</span><span class="op">$</span><span class="va">cores</span><span class="op">[</span><span class="va">cores_time</span><span class="op">$</span><span class="va">days</span> <span class="op">==</span> <span class="va">nd</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">mcc</span>, <span class="st">" cores - "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">mcc</span>, <span class="st">" cores"</span><span class="op">)</span></span>
 <span>    </span>
 <span>    <span class="co"># Define daemons</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="va">mcc</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
@@ -132,7 +139,7 @@ also different values of number of days (optimization windows):</p>
 <span>    <span class="op">}</span></span>
 <span>    <span class="co"># Execute calculations</span></span>
 <span>    <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
-<span>      <span class="va">sessions</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>      <span class="va">sessions</span> <span class="op">%&gt;%</span> </span>
 <span>        <span class="fu"><a href="../reference/get_demand.html">get_demand</a></span><span class="op">(</span>by <span class="op">=</span> <span class="st">"Profile"</span>, resolution <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>    <span class="co"># Reset daemons</span></span>
@@ -145,8 +152,8 @@ also different values of number of days (optimization windows):</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Adapt variables for a better plot</span></span>
-<span><span class="va">cores_time</span> <span class="op">&lt;-</span> <span class="va">cores_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span><span class="va">cores_time</span> <span class="op">&lt;-</span> <span class="va">cores_time</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">mutate</span><span class="op">(</span></span>
 <span>      days <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">days</span>, <span class="st">"days"</span><span class="op">)</span>, </span>
 <span>        levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">n_days_seq</span>, <span class="st">"days"</span><span class="op">)</span><span class="op">)</span></span>
@@ -161,10 +168,10 @@ least for this case with ~70 charging sessions per day)</li>
 relevant</li>
 </ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cores_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">cores_time</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">cores</span>, y <span class="op">=</span> <span class="va">time</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_col</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">days</span><span class="op">)</span>, scales <span class="op">=</span> <span class="st">"free"</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="fu">vars</span><span class="op">(</span><span class="va">days</span><span class="op">)</span>, scales <span class="op">=</span> <span class="st">"free"</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Number of cores"</span>, y <span class="op">=</span> <span class="st">"Computation time (seconds)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="parallel_processing_files/figure-html/unnamed-chunk-4-1.png" alt="Computation time for battery optimization using multiple cores" width="864"></p>
 </div>

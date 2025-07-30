@@ -11,7 +11,7 @@ library(lubridate)
 library(ggplot2)
 ```
 
-The functions `get_demand()` and `get_n_connections()` have time-series calculations that are repeated on a daily basis. A 24-hour period is considered an independent optimization window, thus the corresponding time-series calculations can be done in parallel. 
+The functions `get_demand()` and `get_occupancy()` have time-series calculations that are repeated on a daily basis. A 24-hour period is considered an independent optimization window, thus the corresponding time-series calculations can be done in parallel. 
 
 At the same time, in computer science, a common practice to reduce computation times is **parallel processing** when the CPU of the computer has multiple cores that can work independently. We can discover the number of cores in our computer CPU using function `parallel::detectCores()`:
 
@@ -22,6 +22,11 @@ print(n_cores)
 
 In this case, the CPU used is the Apple M4 Pro, which features 10 performance CPU cores (P-core) running at up to 4.5 GHz along with 4 efficient cores (E-core) running at up to 2.6 GHz. So, when `parallel::detectCores()` returns 14, macOS is exposing 14 logical cores — but not all of them are equal in speed.
 
+
+In **evsim**, parallel processing is used inside `get_demand()` and `get_occupancy()` functions, using the **mirai** package and its `mirai::daemons()` function to set the number of cores that we want to work in parallel. Below you will find an example about how to use this functionality. 
+
+
+
 ## Time-series EV demand calculation
 
 Package `evsim` provides a sample data set of California EV sessions from October 2018 to September 2021. If we filter sessions corresponding to 2019, we have >15.000 sessions, with an average of 70 charging sessions during working days.
@@ -31,7 +36,7 @@ sessions_2019 <- evsim::california_ev_sessions_profiles %>%
   filter(year(ConnectionStartDateTime) == 2019)
 ```
 
-Let's use these real charging sessions to calculate their time-series demand with `get_demand()` function, using multiple cores but also different values of number of days (optimization windows):
+Let's use these real charging sessions to calculate their time-series demand with `get_demand()` function, using multiple cores (with `mirai::daemons()`) but also different values of number of days (optimization windows):
 
 ```{r, echo = T, eval = F}
 n_days_seq <- c(3, 7, 15, 30, 120, 365) # Days in a year
@@ -49,7 +54,7 @@ for (nd in n_days_seq) {
     evsim::adapt_charging_features(time_resolution = 15)
 
   for (mcc in cores_time$cores[cores_time$days == nd]) {
-    message(mcc, " cores - ", Sys.time())
+    message(mcc, " cores")
     
     # Define daemons
     if (mcc > 1) {
