@@ -284,67 +284,75 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
 
   } else {
 
-
     # Change Session identifier to take into account also the row number
     # This is necessary due to the expanded sessions' schedule from smart charging
     sessions <- sessions %>%
       mutate(Session = paste(.data$Session, row_number(), sep = "-")) %>%
       filter(.data$Power > 0) # Remove sessions that are not consuming in certain time slots
 
-    # Align time variables to current time resolution
-    if (!is_aligned(sessions, resolution)) {
-      message(paste0("Warning: charging sessions are aligned to ", resolution, "-minute resolution."))
-      sessions <- sessions %>%
-        adapt_charging_features(time_resolution = resolution)
-    }
+    if (nrow(sessions) == 0) {
 
-    # Expand sessions that are connected more than 1 time slot
-    sessions_to_expand <- sessions %>%
-      filter(.data$ConnectionHours > resolution/60) %>%
-      mutate(Window = date(.data$ConnectionStartDateTime))
-
-    if (nrow(sessions_to_expand) > 0) {
-
-      # Expand sessions
-      sessions_expanded <- sessions_to_expand  %>%
-        split(sessions_to_expand$Window) %>%
-        expand_sessions_parallel(resolution) %>%
-        list_rbind()
-
-      # Join all sessions together
-      sessions_expanded <- sessions_expanded %>%
-        bind_rows(
-          sessions %>%
-            filter(.data$ConnectionHours <= resolution/60) %>%
-            mutate(Timeslot = .data$ConnectionStartDateTime)
-        )
+      demand <- tibble(datetime = dttm_seq)
 
     } else {
-      sessions_expanded <- sessions %>%
-        mutate(Timeslot = .data$ConnectionStartDateTime)
+
+
+      # Align time variables to current time resolution
+      if (!is_aligned(sessions, resolution)) {
+        message(paste0("Warning: charging sessions are aligned to ", resolution, "-minute resolution."))
+        sessions <- sessions %>%
+          adapt_charging_features(time_resolution = resolution)
+      }
+
+      # Expand sessions that are connected more than 1 time slot
+      sessions_to_expand <- sessions %>%
+        filter(.data$ConnectionHours > resolution/60) %>%
+        mutate(Window = date(.data$ConnectionStartDateTime))
+
+      if (nrow(sessions_to_expand) > 0) {
+
+        # Expand sessions
+        sessions_expanded <- sessions_to_expand  %>%
+          split(sessions_to_expand$Window) %>%
+          expand_sessions_parallel(resolution) %>%
+          list_rbind()
+
+        # Join all sessions together
+        sessions_expanded <- sessions_expanded %>%
+          bind_rows(
+            sessions %>%
+              filter(.data$ConnectionHours <= resolution/60) %>%
+              mutate(Timeslot = .data$ConnectionStartDateTime)
+          )
+
+      } else {
+        sessions_expanded <- sessions %>%
+          mutate(Timeslot = .data$ConnectionStartDateTime)
+      }
+
+      sessions_expanded <- sessions_expanded %>%
+        select(any_of(c('Session', 'Timeslot', 'Power'))) %>%
+        left_join(
+          sessions %>%
+            select('Session', !!sym(by)) %>%
+            distinct(),
+          by = 'Session'
+        ) %>%
+        separate_wider_delim("Session", delim = "-", names = c("Session", NA))
+
+      # Calculate power demand by time slot and variable `by`
+      demand <- sessions_expanded %>%
+        group_by(!!sym(by), datetime = .data$Timeslot) %>%
+        summarise(Power = sum(.data$Power)) %>%
+        arrange(factor(!!sym(by), levels = unique(sessions[[by]]))) %>%
+        pivot_wider(names_from = !!sym(by), values_from = 'Power', values_fill = 0) %>%
+        right_join(
+          tibble(datetime = dttm_seq),
+          by = 'datetime'
+        ) %>%
+        arrange(.data$datetime)
+
     }
-
-    sessions_expanded <- sessions_expanded %>%
-      select(any_of(c('Session', 'Timeslot', 'Power'))) %>%
-      left_join(
-        sessions %>%
-          select('Session', !!sym(by)) %>%
-          distinct(),
-        by = 'Session'
-      ) %>%
-      separate_wider_delim("Session", delim = "-", names = c("Session", NA))
-
-    # Calculate power demand by time slot and variable `by`
-    demand <- sessions_expanded %>%
-      group_by(!!sym(by), datetime = .data$Timeslot) %>%
-      summarise(Power = sum(.data$Power)) %>%
-      arrange(factor(!!sym(by), levels = unique(sessions[[by]]))) %>%
-      pivot_wider(names_from = !!sym(by), values_from = 'Power', values_fill = 0) %>%
-      right_join(
-        tibble(datetime = dttm_seq),
-        by = 'datetime'
-      ) %>%
-      arrange(.data$datetime)
   }
 
   # Check if some `by` variable is not in the tibble, then add zeros
@@ -484,6 +492,8 @@ get_occupancy <- function(sessions, dttm_seq = NULL, by = "Profile", resolution 
       sessions_expanded <- sessions %>%
         mutate(Timeslot = .data$ConnectionStartDateTime)
     }
+
+    print(sessions_expanded)
 
     sessions_expanded <- sessions_expanded %>%
       select(any_of(c('Session', 'Timeslot'))) %>%
