@@ -108,7 +108,26 @@ It is recommended to find this value through multiple iterations.</p></dd>
 <span class="r-in"><span>  sessions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">evsim</span><span class="fu">::</span><span class="va"><a href="california_ev_sessions.html">california_ev_sessions</a></span>, <span class="fl">50</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  resolution <span class="op">=</span> <span class="fl">60</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Warning: charging sessions are aligned to 60-minute resolution.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Warning: charging sessions have been aligned to 60-minute resolution.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 472 × 18</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Session Timeslot            Power PowerNominal EnergyRequired</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> S1~1    2018-10-08 <span style="color: #949494;">06:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> S1~1    2018-10-08 <span style="color: #949494;">07:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> S1~1    2018-10-08 <span style="color: #949494;">08:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> S1~1    2018-10-08 <span style="color: #949494;">09:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> S1~1    2018-10-08 <span style="color: #949494;">10:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> S1~1    2018-10-08 <span style="color: #949494;">11:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> S1~1    2018-10-08 <span style="color: #949494;">12:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> S1~1    2018-10-08 <span style="color: #949494;">13:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> S1~1    2018-10-08 <span style="color: #949494;">14:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> S1~1    2018-10-08 <span style="color: #949494;">15:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 462 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more variables: ConnectionHoursLeft &lt;dbl&gt;, ID &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ConnectionStartDateTime &lt;dttm&gt;, ConnectionEndDateTime &lt;dttm&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ChargingStartDateTime &lt;dttm&gt;, ChargingEndDateTime &lt;dttm&gt;, Energy &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ConnectionHours &lt;dbl&gt;, ChargingHours &lt;dbl&gt;, ChargingStation &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   FlexibilityHours &lt;dbl&gt;, UserID &lt;chr&gt;, Profile &lt;chr&gt;</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Discarded 0 % of sessions due to infrastructure</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">sessions_infrastructure</span><span class="op">$</span><span class="va">ChargingStation</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "CHS1"  "CHS2"  "CHS3"  "CHS4"  "CHS5"  "CHS6"  "CHS7"  "CHS8"  "CHS9" </span>
@@ -120,7 +139,26 @@ It is recommended to find this value through multiple iterations.</p></dd>
 <span class="r-in"><span>  sessions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">evsim</span><span class="fu">::</span><span class="va"><a href="california_ev_sessions.html">california_ev_sessions</a></span>, <span class="fl">50</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  resolution <span class="op">=</span> <span class="fl">60</span>, duration_th <span class="op">=</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Warning: charging sessions are aligned to 60-minute resolution.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Warning: charging sessions have been aligned to 60-minute resolution.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 472 × 18</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Session Timeslot            Power PowerNominal EnergyRequired</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> S1~1    2018-10-08 <span style="color: #949494;">06:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> S1~1    2018-10-08 <span style="color: #949494;">07:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> S1~1    2018-10-08 <span style="color: #949494;">08:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> S1~1    2018-10-08 <span style="color: #949494;">09:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> S1~1    2018-10-08 <span style="color: #949494;">10:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> S1~1    2018-10-08 <span style="color: #949494;">11:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> S1~1    2018-10-08 <span style="color: #949494;">12:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> S1~1    2018-10-08 <span style="color: #949494;">13:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> S1~1    2018-10-08 <span style="color: #949494;">14:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> S1~1    2018-10-08 <span style="color: #949494;">15:00:00</span>   0.6          0.6           6.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 462 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more variables: ConnectionHoursLeft &lt;dbl&gt;, ID &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ConnectionStartDateTime &lt;dttm&gt;, ConnectionEndDateTime &lt;dttm&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ChargingStartDateTime &lt;dttm&gt;, ChargingEndDateTime &lt;dttm&gt;, Energy &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ConnectionHours &lt;dbl&gt;, ChargingHours &lt;dbl&gt;, ChargingStation &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   FlexibilityHours &lt;dbl&gt;, UserID &lt;chr&gt;, Profile &lt;chr&gt;</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Discarded 4 % of sessions due to infrastructure</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">sessions_infrastructure</span><span class="op">$</span><span class="va">ChargingStation</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "CHS1"  "CHS2"  "CHS3"  "CHS4"  "CHS5"  "CHS6"  "CHS7"  "CHS8"  "CHS9" </span>
