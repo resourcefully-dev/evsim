@@ -8,7 +8,7 @@ sessions <- evsim::california_ev_sessions %>%
   filter(year(ConnectionStartDateTime) == 2018, month(ConnectionStartDateTime) == 10)
 
 test_that("plot of occupancy duration curve works", {
-  expect_true(ggplot2::is.ggplot(
+  expect_true(ggplot2::is_ggplot(
     plot_occupancy_duration_curve(
       sessions %>% mutate(Profile = "all"),
       by = "Profile",

@@ -254,6 +254,10 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
     stop("Error: `sessions` can't be an empty tibble.")
   }
 
+  if (!(by %in% names(sessions))) {
+    sessions[[by]] <- "Demand"
+  }
+
   demand_vars <- unique(sessions[[by]])
 
   # Definition of `dttm_seq` and `resolution`
@@ -287,7 +291,7 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
     # Change Session identifier to take into account also the row number
     # This is necessary due to the expanded sessions' schedule from smart charging
     sessions <- sessions %>%
-      mutate(Session = paste(.data$Session, row_number(), sep = "-")) %>%
+      mutate(Session = paste(.data$Session, row_number(), sep = "~")) %>%
       filter(.data$Power > 0) # Remove sessions that are not consuming in certain time slots
 
     if (nrow(sessions) == 0) {
@@ -296,12 +300,11 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
 
     } else {
 
-
       # Align time variables to current time resolution
       if (!is_aligned(sessions, resolution)) {
-        message(paste0("Warning: charging sessions are aligned to ", resolution, "-minute resolution."))
         sessions <- sessions %>%
           adapt_charging_features(time_resolution = resolution)
+        message(paste0("Warning: charging sessions have been aligned to ", resolution, "-minute resolution."))
       }
 
       # Expand sessions that are connected more than 1 time slot
@@ -338,7 +341,7 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
             distinct(),
           by = 'Session'
         ) %>%
-        separate_wider_delim("Session", delim = "-", names = c("Session", NA))
+        separate_wider_delim("Session", delim = "~", names = c("Session", NA))
 
       # Calculate power demand by time slot and variable `by`
       demand <- sessions_expanded %>%
@@ -432,6 +435,10 @@ get_occupancy <- function(sessions, dttm_seq = NULL, by = "Profile", resolution 
     stop("Error: `sessions` can't be an empty tibble.")
   }
 
+  if (!(by %in% names(sessions))) {
+    sessions[[by]] <- "Occupancy"
+  }
+
   occupancy_vars <- unique(sessions[[by]])
 
   # Definition of `dttm_seq` and `resolution`
@@ -458,13 +465,13 @@ get_occupancy <- function(sessions, dttm_seq = NULL, by = "Profile", resolution 
     # Change Session identifier to take into account also the row number
     # This is necessary due to the expanded sessions' schedule from smart charging
     sessions <- sessions %>%
-      mutate(Session = paste(.data$Session, row_number(), sep = "-"))
+      mutate(Session = paste(.data$Session, row_number(), sep = "~"))
 
     # Align time variables to current time resolution
     if (!is_aligned(sessions, resolution)) {
-      message(paste0("Warning: charging sessions are aligned to ", resolution, "-minute resolution."))
       sessions <- sessions %>%
         adapt_charging_features(time_resolution = resolution)
+      message(paste0("Warning: charging sessions have been aligned to ", resolution, "-minute resolution."))
     }
 
     # Expand sessions that are connected more than 1 time slot
@@ -503,7 +510,7 @@ get_occupancy <- function(sessions, dttm_seq = NULL, by = "Profile", resolution 
           distinct(),
         by = 'Session'
       ) %>%
-      separate_wider_delim("Session", delim = "-", names = c("Session", NA))
+      separate_wider_delim("Session", delim = "~", names = c("Session", NA))
 
     # Calculate the number of EV connections by time slot and variable `by`
     n_connections <- sessions_expanded %>%
