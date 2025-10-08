@@ -11,7 +11,14 @@ adapt_charging_features(
 )
 }
 \arguments{
-\item{sessions}{tibble, sessions data set in standard format marked by \code{{evprof}} package}
+\item{sessions}{tibble, sessions data set in standard format marked by \code{{evprof}} package.
+The minimum required variables are:
+\itemize{
+\item \code{ConnectionStartDateTime} (POSIXct)
+\item \code{ConnectionHours} (numeric)
+\item \code{Power} (numeric)
+\item \code{Energy} (numeric)
+}}
 
 \item{time_resolution}{integer, time resolution (in minutes) of the sessions' datetime variables}
 

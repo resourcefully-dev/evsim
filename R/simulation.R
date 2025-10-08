@@ -39,14 +39,19 @@ convert_time_num_to_period <- function(time_num) {
 #' The `ChargingHours` is recalculated with the values of `Energy` and `Power`,
 #' limited by `ConnectionHours`. Finally, the charging times are also calculated.
 #'
-#' @param sessions tibble, sessions data set in standard format marked by `{evprof}` package
+#' @param sessions tibble, sessions data set in standard format marked by `{evprof}` package.
+#' The minimum required variables are:
+#' - `ConnectionStartDateTime` (POSIXct)
+#' - `ConnectionHours` (numeric)
+#' - `Power` (numeric)
+#' - `Energy` (numeric)
 #' @param time_resolution integer, time resolution (in minutes) of the sessions' datetime variables
 #' @param power_resolution numeric, power resolution (in kW) of the sessions' power
 #'
 #' @return tibble
 #' @export
 #'
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate filter select any_of everything
 #' @importFrom rlang .data
 #' @importFrom lubridate round_date tz with_tz
 #'
@@ -75,7 +80,7 @@ convert_time_num_to_period <- function(time_num) {
 #'
 adapt_charging_features <- function (sessions, time_resolution = 15, power_resolution = 0.01) {
   sessions_tz <- tz(sessions$ConnectionStartDateTime[1])
-  sessions %>%
+  sessions_adapted <- sessions %>%
     mutate(
       ConnectionStartDateTime = round_date(.data$ConnectionStartDateTime, paste(time_resolution, "mins")),
       ConnectionEndDateTime = with_tz(
@@ -88,7 +93,27 @@ adapt_charging_features <- function (sessions, time_resolution = 15, power_resol
       Energy = round(.data$Power * .data$ChargingHours, 2),
       ChargingStartDateTime = .data$ConnectionStartDateTime,
       ChargingEndDateTime = .data$ChargingStartDateTime + convert_time_num_to_period(.data$ChargingHours)
+    ) |>
+    select(
+      any_of(evsim::sessions_feature_names), everything()
     )
+
+  # Remove sessions with Power <= 0 kW, which would cause NaN values
+  # in the calculation of ChargingHours
+  sessions_adapted_clean <- sessions_adapted %>%
+    filter(
+      .data$Power > 0, .data$ConnectionHours > 0,
+      .data$Energy > 0, .data$ChargingHours > 0
+    )
+  if (nrow(sessions_adapted_clean) < nrow(sessions_adapted)) {
+    message(paste(
+      "Warning:", nrow(sessions_adapted) - nrow(sessions_adapted_clean),
+      "sessions have been removed from the dataset because `Power`, `Energy`, 
+      `ConnectionHours` or `ChargingHours` were 0 or lower."
+    ))
+  }
+
+  return( sessions_adapted_clean )
 }
 
 
