@@ -150,7 +150,7 @@ expand_session <- function(session, resolution) {
     )))
 
   # Power
-  full_power_timeslots <- trunc(session$ChargingHours*60/resolution)
+  full_power_timeslots <- trunc((session$Energy/session$Power)*60/resolution)
   full_power_energy <- session$Power*full_power_timeslots/(60/resolution)
   power_vct <- round(c(
     rep(session$Power, times = full_power_timeslots),
@@ -499,8 +499,6 @@ get_occupancy <- function(sessions, dttm_seq = NULL, by = "Profile", resolution 
       sessions_expanded <- sessions %>%
         mutate(Timeslot = .data$ConnectionStartDateTime)
     }
-
-    print(sessions_expanded)
 
     sessions_expanded <- sessions_expanded %>%
       select(any_of(c('Session', 'Timeslot'))) %>%
