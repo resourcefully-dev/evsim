@@ -292,7 +292,7 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
     # This is necessary due to the expanded sessions' schedule from smart charging
     sessions <- sessions %>%
       mutate(Session = paste(.data$Session, row_number(), sep = "~")) %>%
-      filter(.data$Power > 0) # Remove sessions that are not consuming in certain time slots
+      filter(.data$Power != 0) # Remove sessions that are not consuming in certain time slots
 
     if (nrow(sessions) == 0) {
 
