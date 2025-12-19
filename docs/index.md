@@ -1,0 +1,82 @@
+# evsim
+
+## Overview
+
+evsim is part of a suite of packages to analyse, model and simulate the
+charging behavior of electric vehicle users:
+
+- [evprof](https://resourcefully-dev.github.io/evprof/): Electric
+  Vehicle PROFiling
+- [evsim](https://resourcefully-dev.github.io/evsim/): Electric Vehicle
+  SIMulation
+
+evsim package provides the functions for:
+
+- Simulating new EV sessions based on Gaussian Mixture Models created
+  with package {evprof}
+- Calculating the power demand from a data set of EV sessions in a
+  specific time resolution
+- Calculating the occupancy (number of vehicles connected) in a specific
+  time resolution
+
+## Usage
+
+If you have your own data set of EV charging sessions or you have
+already built your EV model with
+[evprof](https://resourcefully-dev.github.io/evprof/), the best place to
+start is the [Get started
+chapter](https://resourcefully-dev.github.io/evsim/articles/evsim.html)
+in the package website.
+
+## Installation
+
+You can install the package from CRAN or the latest development version
+from GitHub:
+
+``` r
+
+# CRAN stable release
+install.packages("evsim")
+
+# install.packages("pak")
+pak::pak("resourcefully-dev/evsim")
+```
+
+## Getting help
+
+If you encounter a clear bug, please open an issue with a minimal
+reproducible example on
+[GitHub](https://github.com/resourcefully-dev/evsim/issues).
+
+For further technical details, you can read the following academic
+articles about the methodology used in this paper:
+
+- **Increasing hosting capacity of low-voltage distribution network
+  using smart charging based on local and dynamic capacity limits**.
+  Sustainable Energy, Grids and Networks, vol. 41. Elsevier BV,
+  p. 101626, March 2025. [DOI
+  link](https://doi.org/10.1016/j.segan.2025.101626).
+- **Assessment of electric vehicle charging hub based on stochastic
+  models of user profiles**. Expert Systems with Applications (Vol. 227,
+  p. 120318). Elsevier BV. May 2023. [DOI
+  link](https://doi.org/10.1016/j.eswa.2023.120318).
+- **Potential benefits of scheduling electric vehicle sessions over
+  limiting charging power**. CIRED Porto Workshop 2022: E-mobility and
+  power distribution systems. Institution of Engineering and
+  Technology, 2022. [DOI
+  link](https://ieeexplore.ieee.org/abstract/document/9841653).
+- **Flexibility management of electric vehicles based on user profiles:
+  The Arnhem case study**. International Journal of Electrical Power and
+  Energy Systems, vol. 133. Elsevier BV, p. 107195, Dec. 2021. [DOI
+  link](https://doi.org/10.1016/j.ijepes.2021.107195).
+- **Electric vehicle user profiles for aggregated flexibility
+  planning**. IEEE PES Innovative Smart Grid Technologies Europe (ISGT
+  Europe). IEEE, Oct. 18, 2021. [DOI
+  link](https://doi.org/10.1109/isgteurope52324.2021.9639931).
+
+## Acknowledgements
+
+This work started under a PhD program in the the University of Girona in
+collaboration with [Resourcefully](https://resourcefully.nl/), the
+energy transition consulting company that currently supports the
+development and maintenance.
