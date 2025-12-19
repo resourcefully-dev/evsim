@@ -20,7 +20,6 @@ reference:
   - contents:
     - get_demand
     - get_occupancy
-    - plot_ts
   - title: Support functions
   - contents:
     - get_charging_rates_distribution

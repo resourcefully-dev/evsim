@@ -19,7 +19,7 @@ estimate_connection(n, mu, sigma, log)
 vector of numeric values
 }
 \description{
-Estimate sessions connection values following a Multi-variate Guassian
+Estimate sessions connection values following a Multi-variate Gaussian
 distribution.
 The minimum considered value for duration is 30 minutes.
 }

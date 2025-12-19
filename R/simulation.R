@@ -121,7 +121,7 @@ adapt_charging_features <- function (sessions, time_resolution = 15, power_resol
 #'
 #' Get charging rates distribution in percentages from a charging sessions data set
 #'
-#' @param sessions tibble, sessions data set in standard format marked by `{evprof}` packaget
+#' @param sessions tibble, sessions data set in standard format marked by `{evprof}` package
 #' @param unit character. Valid base units are `second`, `minute`, `hour`, `day`,
 #' `week`, `month`, `bimonth`, `quarter`, `season`, `halfyear` and `year`.
 #' It corresponds to `unit` parameter in `lubridate::floor_date` function.
@@ -260,7 +260,7 @@ get_estimated_energy <- function(power_vct, energy_models, energy_log) {
 
 #' Estimate sessions connection values
 #'
-#' Estimate sessions connection values following a Multi-variate Guassian
+#' Estimate sessions connection values following a Multi-variate Gaussian
 #' distribution.
 #' The minimum considered value for duration is 30 minutes.
 #'

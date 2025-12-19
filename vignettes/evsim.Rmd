@@ -185,11 +185,11 @@ estimated_demand <- sessions_estimated %>%
   get_demand(dttm_seq)
 ```
 
-We can also visualize the estimated demand in an HTML plot using the function `plot_ts`:
+We can also visualize the estimated demand in an HTML plot using the function `timefully::plot_ts`:
 
 ```{r plot, echo=TRUE, fig.width=9}
 estimated_demand %>% 
-  plot_ts(ylab = 'Power demand (kW)', fillGraph = T, stackedGraph = T)
+  timefully::plot_ts(ylab = 'Power demand (kW)', fillGraph = T, stackedGraph = T)
 ```
 
 

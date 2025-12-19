@@ -84,7 +84,7 @@ demand_comparison <- demand_5 %>%
   tidyr::fill(-datetime, .direction = 'down')
 
 demand_comparison %>% 
-  plot_ts(stepPlot = T, strokeWidth = 2, ylab = "EV demand (kW)")
+  timefully::plot_ts(stepPlot = T, strokeWidth = 2, ylab = "EV demand (kW)")
 ```
 
 The power profile with a resolution of 5 minutes represents in a higher accuracy when sessions start and finish. If we zoom-in, we can see clearly that the average power profile really depends on the time resolution:
@@ -95,7 +95,7 @@ demand_comparison %>%
     datetime >= dmy_h("31/01/2023 16", tz = ev_model$metadata$tzone),
     datetime < dmy_h("31/01/2023 19", tz = ev_model$metadata$tzone)
   ) %>% 
-  plot_ts(stepPlot = T, strokeWidth = 2, ylab = "EV demand (kW)")
+  timefully::plot_ts(stepPlot = T, strokeWidth = 2, ylab = "EV demand (kW)")
 ```
 
 However, the total area of the three lines (energy consumed) corresponds to the same value since the power values are the average power of every time-slot whatever the resolution is:
