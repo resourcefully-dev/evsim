@@ -1,55 +1,6 @@
 
 # Utils -------------------------------------------------------------------
 
-#' Interactive plot for time-series tibbles
-#'
-#' First column of the `df` tibble must be a `datetime` or date variable.
-#' The rest of columns must be numeric of the same units. This functions makes
-#' use of `dygraphs` package to generate an HTML Dygraphs plot.
-#'
-#' @param df data.frame or tibble, first column of name `datetime` being of class datetime and rest of columns being numeric
-#' @param title character, title of the plot (accepts HTML code)
-#' @param xlab character, X axis label (accepts HTML code)
-#' @param ylab character, Y axis label (accepts HTML code)
-#' @param legend_show character, when to display the legend.
-#' Specify "always" to always show the legend.
-#' Specify "onmouseover" to only display it when a user mouses over the chart.
-#' Specify "follow" to have the legend show as overlay to the chart which follows the mouse.
-#' The default behavior is "auto", which results in "always" when more than one series
-#' is plotted and "onmouseover" when only a single series is plotted.
-#' @param legend_width integer, width (in pixels) of the div which shows the legend.
-#' @param group character, dygraphs group to associate this plot with. The x-axis zoom level of dygraphs plots within a group is automatically synchronized.
-#' @param width Width in pixels (optional, defaults to automatic sizing)
-#' @param height Height in pixels (optional, defaults to automatic sizing)
-#' @param ... extra arguments to pass to `dygraphs::dyOptions` function.
-#'
-#' @return dygraph
-#' @export
-#'
-#' @importFrom dygraphs dygraph dyLegend dyOptions dyCSS
-#'
-#' @examples
-#' suppressMessages(library(lubridate))
-#' suppressMessages(library(dplyr))
-#'
-#' # Get demand with the complete datetime sequence from the sessions
-#' sessions <- head(evsim::california_ev_sessions, 100)
-#' demand <- get_demand(
-#'   sessions,
-#'   by = "Session",
-#'   resolution = 60
-#' )
-#' demand %>% plot_ts()
-#'
-plot_ts <- function(df, title = NULL, xlab = NULL, ylab = NULL,
-                    legend_show = "auto", legend_width = 250,
-                    group = NULL, width = NULL, height = NULL, ...) {
-  dygraph(df, main = title, xlab = xlab, ylab = ylab, group = group, width = width, height = height) %>%
-    dyLegend(show = legend_show, width = legend_width, showZeroValues = FALSE) %>%
-    dyOptions(retainDateWindow = TRUE, useDataTimezone = TRUE, ...) %>%
-    dyCSS(system.file("www", "dystyle.css", package = "evsim"))
-}
-
 
 #' Is the sessions data set aligned in time?
 #'
@@ -231,7 +182,7 @@ expand_sessions_parallel <- function(sessions_lst, resolution) {
 #'   by = "Session",
 #'   resolution = 60
 #' )
-#' demand %>% plot_ts(ylab = "EV demand (kW)", legend_show = "onmouseover")
+#' print(demand)
 #'
 #' # Get demand with a custom datetime sequence and resolution of 15 minutes
 #' sessions <- head(evsim::california_ev_sessions_profiles, 100)
@@ -246,7 +197,7 @@ expand_sessions_parallel <- function(sessions_lst, resolution) {
 #'   by = "Profile",
 #'   resolution = 15
 #' )
-#' demand %>% plot_ts(ylab = "EV demand (kW)", legend_show = "onmouseover")
+#' print(demand)
 #'
 get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 15) {
 
@@ -411,8 +362,7 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
 #'   by = "ChargingStation",
 #'   resolution = 60
 #' )
-#' connections %>%
-#'   plot_ts(ylab = "Vehicles connected", legend_show = "onmouseover")
+#' print(connections)
 #'
 #' # Get occupancy with a custom datetime sequence and resolution of 15 minutes
 #' sessions <- head(evsim::california_ev_sessions_profiles, 100)
@@ -426,8 +376,7 @@ get_demand <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 1
 #'   dttm_seq = dttm_seq,
 #'   by = "Profile"
 #' )
-#' connections %>%
-#'   plot_ts(ylab = "Vehicles connected", legend_show = "onmouseover")
+#' print(connections)
 #'
 get_occupancy <- function(sessions, dttm_seq = NULL, by = "Profile", resolution = 15) {
 
