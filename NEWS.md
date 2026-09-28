@@ -1,3 +1,8 @@
+# evsim 1.7.2
+
+* Bug fix in `adapt_charging_features()`: `Energy` could exceed what fits between the connection datetimes, because `ConnectionHours` was rounded to 2 decimals before capping the charging time while the datetimes are truncated to whole minutes (e.g. 49 minutes at 11 kW gave 9.02 kWh instead of at most 8.98 kWh). Charging time and `Energy` are now derived from the whole-minute datetimes, and `Energy` is rounded down to 0.01 kWh.
+
+
 # evsim 1.7.1
 
 * Bug fix in `get_occupancy()`
