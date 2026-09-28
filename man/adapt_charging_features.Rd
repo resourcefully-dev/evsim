@@ -34,9 +34,15 @@ Calculate connection and charging times according to energy, power and time reso
 All sessions' \code{Power} must be higher than \code{0}, to avoid \code{NaN} values from dividing
 by zero.
 The \code{ConnectionStartDateTime} is first aligned to the desired time resolution,
-and the \code{ConnectionEndDateTime} is calculated according to the \code{ConnectionHours}.
-The \code{ChargingHours} is recalculated with the values of \code{Energy} and \code{Power},
-limited by \code{ConnectionHours}. Finally, the charging times are also calculated.
+and the \code{ConnectionEndDateTime} is calculated according to the \code{ConnectionHours},
+truncated to whole minutes. The charging time is the time needed to charge
+\code{Energy} at \code{Power}, limited by the connection time. \code{Energy} is then
+recalculated from \code{Power} and the charging time, rounded down to 0.01 kWh,
+so it never exceeds what fits in the connection window. The
+\code{ChargingEndDateTime} is the whole minute in which the energy is reached,
+so the charging window always contains \code{Energy} and never ends after
+\code{ConnectionEndDateTime}. \code{ConnectionHours} and \code{ChargingHours} are rounded
+to 2 decimals.
 }
 \examples{
 suppressMessages(library(dplyr))

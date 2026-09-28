@@ -35,9 +35,15 @@ convert_time_num_to_period <- function(time_num) {
 #' All sessions' `Power` must be higher than `0`, to avoid `NaN` values from dividing
 #' by zero.
 #' The `ConnectionStartDateTime` is first aligned to the desired time resolution,
-#' and the `ConnectionEndDateTime` is calculated according to the `ConnectionHours`.
-#' The `ChargingHours` is recalculated with the values of `Energy` and `Power`,
-#' limited by `ConnectionHours`. Finally, the charging times are also calculated.
+#' and the `ConnectionEndDateTime` is calculated according to the `ConnectionHours`,
+#' truncated to whole minutes. The charging time is the time needed to charge
+#' `Energy` at `Power`, limited by the connection time. `Energy` is then
+#' recalculated from `Power` and the charging time, rounded down to 0.01 kWh,
+#' so it never exceeds what fits in the connection window. The
+#' `ChargingEndDateTime` is the whole minute in which the energy is reached,
+#' so the charging window always contains `Energy` and never ends after
+#' `ConnectionEndDateTime`. `ConnectionHours` and `ChargingHours` are rounded
+#' to 2 decimals.
 #'
 #' @param sessions tibble, sessions data set in standard format marked by `{evprof}` package.
 #' The minimum required variables are:
@@ -53,7 +59,7 @@ convert_time_num_to_period <- function(time_num) {
 #'
 #' @importFrom dplyr mutate filter select any_of everything
 #' @importFrom rlang .data
-#' @importFrom lubridate round_date tz with_tz
+#' @importFrom lubridate round_date tz with_tz minutes
 #'
 #' @examples
 #' suppressMessages(library(dplyr))
@@ -88,11 +94,22 @@ adapt_charging_features <- function (sessions, time_resolution = 15, power_resol
         tzone = sessions_tz
       ), # Need to convert timezone to UTC to avoid NA values for time-shift hours
       Power = round_to_interval(.data$Power, interval = power_resolution),
-      ConnectionHours = round(as.numeric(.data$ConnectionEndDateTime - .data$ConnectionStartDateTime, unit="hours"), 2),
-      ChargingHours = round(pmin(.data$Energy/.data$Power, .data$ConnectionHours), 2),
-      Energy = round(.data$Power * .data$ChargingHours, 2),
+      # Exact connection time (whole minutes) between the datetime columns.
+      # Rounding it to 2 decimals before capping the charging time let `Energy`
+      # exceed what fits in the connection window (e.g. 49 min -> 0.82 h).
+      ConnectionHours = as.numeric(.data$ConnectionEndDateTime - .data$ConnectionStartDateTime, unit="hours"),
+      ChargingHours = pmin(.data$Energy/.data$Power, .data$ConnectionHours),
+      # Rounded down to 0.01 kWh so Energy never exceeds Power * ChargingHours
+      Energy = floor(.data$Power * .data$ChargingHours * 100 + 1e-9) / 100,
       ChargingStartDateTime = .data$ConnectionStartDateTime,
-      ChargingEndDateTime = .data$ChargingStartDateTime + convert_time_num_to_period(.data$ChargingHours)
+      # Charging ends within the minute the energy is reached (ceiling), so the
+      # charging window always contains Energy and never leaves the connection
+      ChargingEndDateTime = with_tz(
+        with_tz(.data$ChargingStartDateTime, "UTC") + minutes(ceiling(.data$ChargingHours * 60 - 1e-9)),
+        tzone = sessions_tz
+      ),
+      ConnectionHours = round(.data$ConnectionHours, 2),
+      ChargingHours = round(.data$ChargingHours, 2)
     ) |>
     select(
       any_of(evsim::sessions_feature_names), everything()
